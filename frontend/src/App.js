@@ -1012,8 +1012,8 @@ function App() {
     clearMessages();
 
     if (subscriptionForm.startDate && subscriptionForm.endDate) {
-      if (new Date(subscriptionForm.endDate) < new Date(subscriptionForm.startDate)) {
-        setError("The end date must be the same as or later than the start date");
+      if (new Date(subscriptionForm.endDate) <= new Date(subscriptionForm.startDate)) {
+        setError("The end date must be after the start date");
         setBusyAction("");
         return;
       }
