@@ -1,0 +1,356 @@
+====================================================
+  SPARKLENZ — FULL AI GENERATION PROMPT OVERVIEW
+  Social Media Marketing & Content Creation Agency
+  Management System
+====================================================
+
+Use this document as a structured prompt guide to generate
+each part of the Sparklenz system using AI tools (e.g.,
+Claude, ChatGPT, Cursor, GitHub Copilot, v0.dev, etc.)
+
+====================================================
+SECTION 1 — PROJECT CONTEXT (Give this to AI first)
+====================================================
+
+"I am building a web-based management platform for a social
+media marketing and content creation agency called Sparklenz.
+Sparklenz helps businesses grow online through social media
+marketing, content creation, and digital management services.
+
+The system must centralize and replace manual spreadsheet-based
+operations for 100+ staff and 10,000+ clients.
+
+Tech stack:
+- Web-based (browser accessible)
+- Secure authentication system
+- Robust relational database
+- Open-source libraries preferred
+- No external payment gateway required
+
+The system has 5 main modules:
+1. User & Role Management
+2. Client & Package Management
+3. Task Management & Staff Scheduling
+4. Payment & Revenue Tracking
+5. Performance & Analytics Reporting
+
+Non-functional requirements:
+- High performance under large user loads
+- User-friendly interface
+- Data accuracy
+- Reliability and uptime
+- Scalability
+- Always accessible (high availability)"
+
+====================================================
+SECTION 2 — DATABASE SCHEMA GENERATION PROMPT
+====================================================
+
+Prompt to use:
+--------------
+"Generate a full relational database schema (SQL) for the
+Sparklenz social media agency management system.
+
+Include the following tables with all fields, data types,
+primary keys, foreign keys, and constraints:
+
+1. users
+   - id (UUID, PK)
+   - name (VARCHAR)
+   - email (VARCHAR, UNIQUE)
+   - password_hash (VARCHAR)
+   - role_id (FK → roles)
+   - is_active (BOOLEAN)
+   - created_at (TIMESTAMP)
+
+2. roles
+   - id (UUID, PK)
+   - name (VARCHAR) -- e.g. Admin, Manager, Staff
+   - permissions (JSON or TEXT)
+
+3. sessions
+   - id (UUID, PK)
+   - user_id (FK → users)
+   - token (VARCHAR)
+   - created_at (TIMESTAMP)
+   - expires_at (TIMESTAMP)
+
+4. clients
+   - id (UUID, PK)
+   - name (VARCHAR)
+   - email (VARCHAR)
+   - phone (VARCHAR)
+   - company (VARCHAR)
+   - created_at (TIMESTAMP)
+
+5. packages
+   - id (UUID, PK)
+   - name (ENUM: Silver, Gold, Platinum, Diamond)
+   - description (TEXT)
+   - price (DECIMAL)
+   - features (JSON)
+
+6. subscriptions
+   - id (UUID, PK)
+   - client_id (FK → clients)
+   - package_id (FK → packages)
+   - status (ENUM: Active, Pending, Cancelled)
+   - start_date (DATE)
+   - end_date (DATE)
+
+7. tasks
+   - id (UUID, PK)
+   - title (VARCHAR)
+   - description (TEXT)
+   - client_id (FK → clients)
+   - status (ENUM: Pending, In Progress, Completed)
+   - deadline (DATE)
+   - drive_link (VARCHAR)
+   - created_by (FK → users)
+   - created_at (TIMESTAMP)
+
+8. task_assignments
+   - id (UUID, PK)
+   - task_id (FK → tasks)
+   - user_id (FK → users)
+   - assigned_at (TIMESTAMP)
+
+9. payments
+   - id (UUID, PK)
+   - client_id (FK → clients)
+   - amount (DECIMAL)
+   - payment_date (DATE)
+   - note (TEXT)
+   - recorded_by (FK → users)
+   - created_at (TIMESTAMP)
+
+10. performance_metrics
+    - id (UUID, PK)
+    - client_id (FK → clients)
+    - month (DATE)
+    - reach (BIGINT)
+    - impressions (BIGINT)
+    - engagement (DECIMAL) -- percentage
+    - recorded_by (FK → users)
+    - created_at (TIMESTAMP)
+
+Generate this as PostgreSQL-compatible SQL with all
+constraints, indexes on foreign keys, and timestamps."
+
+====================================================
+SECTION 3 — BACKEND API GENERATION PROMPT
+====================================================
+
+Prompt to use:
+--------------
+"Generate a RESTful API using Node.js + Express (or Laravel PHP)
+for the Sparklenz agency management system.
+
+Implement the following endpoints:
+
+--- AUTH ---
+POST   /api/auth/register       -- Register new user
+POST   /api/auth/login          -- Login, return JWT
+POST   /api/auth/logout         -- Invalidate token
+GET    /api/auth/me             -- Get current user
+
+--- USERS & ROLES ---
+GET    /api/users               -- List all users (Admin only)
+GET    /api/users/:id           -- Get user by ID
+PUT    /api/users/:id           -- Update user profile
+DELETE /api/users/:id           -- Deactivate user
+GET    /api/roles               -- List roles
+POST   /api/roles               -- Create role
+PUT    /api/roles/:id           -- Update role/permissions
+DELETE /api/roles/:id           -- Delete role
+
+--- CLIENTS ---
+POST   /api/clients             -- Add client
+GET    /api/clients             -- List all clients
+GET    /api/clients/:id         -- Get client detail
+PUT    /api/clients/:id         -- Update client
+DELETE /api/clients/:id         -- Remove client
+
+--- PACKAGES & SUBSCRIPTIONS ---
+POST   /api/packages            -- Create package
+GET    /api/packages            -- List packages
+PUT    /api/packages/:id        -- Edit package
+DELETE /api/packages/:id        -- Delete package
+POST   /api/subscriptions       -- Assign package to client
+GET    /api/subscriptions/:clientId -- Get client subscription
+PUT    /api/subscriptions/:id   -- Renew or change
+DELETE /api/subscriptions/:id   -- Cancel subscription
+
+--- TASKS ---
+POST   /api/tasks               -- Create task
+GET    /api/tasks               -- List tasks (filter by client/status)
+GET    /api/tasks/:id           -- Get task detail
+PUT    /api/tasks/:id           -- Update task (status, deadline, link)
+DELETE /api/tasks/:id           -- Delete task
+POST   /api/tasks/:id/assign    -- Assign member to task
+DELETE /api/tasks/:id/assign/:userId -- Unassign member
+
+--- PAYMENTS ---
+POST   /api/payments            -- Log payment
+GET    /api/payments            -- List payments
+GET    /api/payments/:id        -- Get payment detail
+PUT    /api/payments/:id        -- Edit payment record
+DELETE /api/payments/:id        -- Void payment record
+GET    /api/clients/:id/balance -- View client balance
+GET    /api/reports/revenue     -- Revenue report (monthly)
+
+--- PERFORMANCE ---
+POST   /api/metrics             -- Log metrics
+GET    /api/metrics             -- List metrics (filter by client/month)
+PUT    /api/metrics/:id         -- Update metric entry
+DELETE /api/metrics/:id         -- Remove metric entry
+GET    /api/reports/performance/:clientId -- Monthly performance report
+
+Use JWT middleware for protected routes. Apply role-based
+access control (Admin, Manager, Staff). Return consistent
+JSON responses with status codes. Include input validation."
+
+====================================================
+SECTION 4 — FRONTEND UI GENERATION PROMPT
+====================================================
+
+Prompt to use:
+--------------
+"Generate a modern, responsive admin dashboard UI for the
+Sparklenz social media agency management system using
+React.js with Tailwind CSS (or plain HTML/CSS).
+
+The dashboard should include:
+
+SIDEBAR NAVIGATION:
+- Dashboard (overview stats)
+- Clients
+- Packages & Subscriptions
+- Tasks
+- Staff / Users
+- Payments
+- Performance Reports
+- Settings
+
+DASHBOARD HOME PAGE:
+- Stats cards: Total Clients, Active Subscriptions, Tasks Due Today, Monthly Revenue
+- Recent tasks table (client, status, deadline, assigned to)
+- Revenue chart (monthly bar chart)
+- Quick action buttons: Add Client, Create Task, Log Payment
+
+CLIENTS PAGE:
+- Table with: Name, Email, Company, Package, Status, Actions
+- Add/Edit client modal form
+- View client detail panel
+
+TASKS PAGE:
+- Kanban board OR table view (toggle)
+- Columns: Pending, In Progress, Completed
+- Task card: Title, Client, Assignee, Deadline, Drive Link
+- Create task modal with all fields
+
+PAYMENTS PAGE:
+- Transactions table: Client, Amount, Date, Recorded By
+- Client balance summary
+- Monthly revenue summary card
+- Log payment form
+
+PERFORMANCE PAGE:
+- Client selector dropdown
+- Month/year filter
+- Metrics cards: Reach, Impressions, Engagement Rate
+- Line/bar chart visualization
+- Export report button
+
+Use a clean, professional design with the agency color
+palette: Black (#000000), Gold/Yellow (#F5C518), White (#FFFFFF).
+The system is used by 100+ staff daily so prioritize
+clarity and usability."
+
+====================================================
+SECTION 5 — ROLE-BASED ACCESS CONTROL PROMPT
+====================================================
+
+Prompt to use:
+--------------
+"Define and implement a role-based access control (RBAC)
+system for Sparklenz with the following roles:
+
+ADMIN:
+- Full access to all modules
+- Can create/edit/delete users and roles
+- Can view all reports
+- Can manage packages and pricing
+
+MANAGER:
+- Can manage clients and subscriptions
+- Can assign tasks to staff
+- Can view payment records
+- Can view and generate performance reports
+- Cannot manage users or roles
+
+STAFF:
+- Can view their assigned tasks only
+- Can update task status
+- Can attach Google Drive links
+- Cannot view payment or financial data
+- Cannot manage clients or packages
+
+Generate middleware functions that check the user's role
+before allowing access to each API route. Return 403
+Forbidden if the role does not have permission."
+
+====================================================
+SECTION 6 — PERFORMANCE CHARTS PROMPT
+====================================================
+
+Prompt to use:
+--------------
+"Generate a React component for the Sparklenz Performance
+Analytics page using Chart.js or Recharts.
+
+Include:
+1. Line chart — Monthly Reach & Impressions over 12 months
+2. Bar chart — Monthly Revenue over 12 months
+3. Gauge or percentage card — Engagement Rate
+4. Data table below charts showing: Month, Reach,
+   Impressions, Engagement %, Actions (Edit/Delete)
+
+Props:
+- clientId: string
+- month: string
+- year: number
+
+Fetch data from GET /api/reports/performance/:clientId
+Handle loading and empty states gracefully."
+
+====================================================
+SECTION 7 — SUGGESTED TECH STACK
+====================================================
+
+Frontend:
+  - React.js (Vite)
+  - Tailwind CSS
+  - Recharts or Chart.js
+  - Axios (HTTP client)
+  - React Router
+
+Backend:
+  - Node.js + Express.js
+    OR
+  - Laravel (PHP)
+
+Database:
+  - PostgreSQL (recommended)
+    OR
+  - MySQL
+
+Authentication:
+  - JWT (JSON Web Tokens)
+  - bcrypt (password hashing)
+
+Hosting:
+  - Frontend: Vercel / Netlify
+  - Backend: Railway / Render / VPS
+  - Database: Supabase / PlanetScale / self-hosted
+

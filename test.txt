@@ -1,0 +1,41 @@
+http://localhost:5000/api/packages
+{
+  "name": "Gold",
+  "price": 45000,
+  "description": "Monthly marketing package",
+  "features": ["10 posts", "2 reels", "1 ad campaign"]
+}
+
+http://localhost:5000/api/users
+{
+  "name": "Admin User",
+  "email": "admin@sparklenz.com",
+  "password": "123456",
+  "role": "admin"
+}
+
+http://localhost:5000/api/subscriptions
+{
+  "clientName": "Client A",
+  "packageId": "PASTE_PACKAGE_ID_HERE",
+  "status": "active"
+}
+
+http://localhost:5000/api/payments
+{
+  "title": "Design Instagram creatives",
+  "description": "Create 5 post designs",
+  "assignedTo": "Nimal",
+  "status": "pending"
+}
+
+http://localhost:5000/api/metrics
+{
+  "campaignName": "April Leads Drive",
+  "platform": "Facebook",
+  "impressions": 15000,
+  "reach": 8000,
+  "engagement": 1200,
+  "leads": 110
+}
+
